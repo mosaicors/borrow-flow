@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    name: Lint, types, tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      # Integration tests start an in-memory MongoDB, so no service container is needed.
+      - run: npm test
+      - run: npm run build
+
+  docker:
+    name: Docker Compose smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker compose up -d --build
+      - name: Wait until the page and the API answer
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://localhost:3000 > /dev/null \
+              && curl -fsS http://localhost:3001/users.list > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs
+          exit 1

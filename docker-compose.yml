@@ -1,0 +1,20 @@
+# Runs the app against a real MongoDB with data that survives restarts.
+# Not needed for a quick look: `npm install && npm run dev` uses an in-memory database.
+services:
+  mongo:
+    image: mongo:8
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: .
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:
