@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "Neighbours ask to borrow an item for a few days and see the owner's answer live.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full bg-stone-50 text-stone-900">{children}</body>
